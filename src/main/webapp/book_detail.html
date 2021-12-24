@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍详情</title>
+
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <script src="js/getParameter.js"></script>
+
+
+    <style>
+        .price_num {
+            color: red;
+            font-size: large;
+        }
+
+        .detail {
+            /*flex 布局*/
+            display: flex;
+            /*实现垂直居中*/
+            align-items: center;
+            /*实现水平居中*/
+            justify-content: center;
+
+            text-align: justify;
+            width: 610px;
+            height: 450px;
+            border: 1px solid #1b6d85;
+            margin: 0 auto;
+            color: black;
+        }
+
+        .cartbox {
+            margin-top: 30px;
+        }
+        .cartbox a {
+            font-size: 14px;
+            background: #ff4848;
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .cartbox a i{
+            font-size: 16px;
+            vertical-align: top;
+            margin-right: 3px;
+        }
+
+        /*class="detail" style="width: 400px;height:450px;align-items:center;text-align: center;margin:0 auto;border: 1px solid #1b6d85"*/
+    </style>
+
+    <script>
+        $(function () {
+
+            var bid = getParameter("bid");
+            $.get("book/findOne", {bid: bid}, function (book) {
+                var book_detail = '<div style="padding-right: 35px;"><img src="image/' + book.bimgid + '" alt="" height="200" width="200"></div>\n' +
+                    '    <div >\n' +
+                    '        <p><h4>' + book.bname + '</h4></p>\n' +
+                    '        <p>' + book.bintroduce + '</p>\n' +
+                    '        <p class="price_num">\n' +
+                    '            <span>&yen;</span>\n' +
+                    '            <span>' + book.bprice + '</span>\n' +
+                    '        </p>\n' +
+                    '        <p>\n' +
+                    '            <span><input type="number" oninput="if(value>'+book.bcount+') value='+book.bcount+'" style="width: 55px" value="1" name="number" min="1" max="' + book.bcount + '"></span>\n' +
+                    '            <span style="margin-left: 10px">库存: ' + book.bcount + '</span>\n' +
+                    '        </p>\n' +
+                    '        <p class="cartbox">\n' +
+                    '            <a class="btn" id="addCart" onclick="add();"><i class="glyphicon glyphicon-heart-empty"></i>加入购物车</a>\n' +
+                    '        </p>\n' +
+                    '    </div>';
+                $("#bookdetail").html(book_detail);
+
+            });
+
+
+
+        });
+
+
+        function add(){
+            $.ajaxSettings.async=false;
+            $.get("user/getUser",{},function(data){
+                if(data){
+                    var num=$("input[name='number']").val();
+                    var bid=getParameter("bid");
+
+                    $.get("cart/addCart",{num:num,bid:bid},function(){
+
+                        alert("成功加入购物车！")
+                    });
+
+                }else{
+
+                    $("#addCart").text("请先登录！");
+
+                }
+            });
+            $.ajaxSettings.async=true;
+
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div style="margin-top: 20px">
+    <div class="detail" id="bookdetail">
+        <div style="padding-right: 35px;"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+        <div>
+            <p><h4>四世同堂</h4></p>
+            <p>[美] 肯德拉·艾略特 著，骆佳圆 译 / 浙江文艺出版社</p>
+            <p class="price_num">
+                <span>&yen;</span>
+                <span>38</span>
+            </p>
+            <p>
+                <span><input type="number"  style="width: 50px" placeholder="1" name="number" min="1" max="5"></span>
+                <span style="margin-left: 10px">库存: 30</span>
+            </p>
+            <p>
+                <a class="btn" id="addCart"><i class="glyphicon glyphicon-heart-empty"></i>加入购物车</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

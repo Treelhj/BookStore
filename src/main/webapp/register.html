@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <!-- 样式 -->
+    <link rel="stylesheet" href="css/register.css">
+
+    <script>
+
+
+        function changeCheckCode(img){
+            img.src="checkCode?"+new Date().getTime();
+        }
+
+        function checkUsername() {
+            var username = $("#username").val();
+            var flag=null;
+            if(username==null||username==""){
+                $("#username").css("border","1px solid red");
+                flag=false;
+            }else{
+                $("#username").css("border","");
+                flag=true;
+            }
+            return flag;
+        }
+
+        function checkPassword(){
+            var password=$("#password").val();
+            var reg_password=/^\w{6,12}$/;
+            var flag=reg_password.test(password);
+            if(flag){
+                $("#password").css("border","");
+            }else{
+                $("#password").css("border","1px solid red");
+            }
+            var password2=$("#password2").val();
+            if(password2!=null&&password2!=""){
+                checkPassword2();
+            }
+            return flag;
+        }
+
+        function checkPassword2(){
+            var password=$("#password").val();
+            var password2=$("#password2").val();
+            var flag=password2 == password;
+            if(flag){
+                $("#password2").css("border","");
+            }else{
+                $("#password2").css("border","1px solid red");
+            }
+            return flag;
+        }
+
+        function checkEmail(){
+            var email=$("#email").val();
+            var reg_email=/^\w+@\w+\.\w+$/;
+            var flag=reg_email.test(email);
+            if(flag){
+                $("#email").css("border","");
+            }else{
+                $("#email").css("border","1px solid red");
+            }
+            return flag;
+        }
+
+        function checkCheckcode(){
+            var checkcode=$("#checkcode").val();
+            var flag=null;
+            if(checkcode == null || checkcode==""){
+                $("#checkcode").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#checkcode").css("border","");
+                flag=true;
+            }
+            return flag;
+        };
+
+
+        $(function(){
+
+            $("#reg").click(function(){
+                if(checkUsername()&&checkPassword()&&checkPassword2()&&checkEmail()&&checkCheckcode()){
+                    if(window.confirm("您确定注册吗？")) {
+                        $.post("user/regist", $("#regUser").serialize(), function (data) {
+                            if (data.flag) {
+                                //注册成功
+                                location.href = "register_ok.html";
+                            } else {
+                                $("#errorMsg").html(data.errorMsg);
+                                $("#checkimg").attr("src", "checkCode?" + new Date().getTime());
+                            }
+                        })
+                    }
+                }
+            });
+
+            $("#username").blur(checkUsername);
+            $("#password").blur(checkPassword);
+            $("#password2").blur(checkPassword2);
+            $("#email").blur(checkEmail);
+            $("#checkcode").blur(checkCheckcode);
+
+
+        });
+
+
+
+    </script>
+
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="login" style="margin-top:50px;">
+
+    <div class="header">
+        <div class="switch" id="switch">
+            <span class="switch_btn_focus"  href="javascript:void(0);" tabindex="7">用户注册</span>
+        </div>
+    </div>
+    <!--注册-->
+    <div class="qlogin" id="qlogin" style="display: block; ">
+
+        <div class="web_login">
+            <!--登录错误提示消息-->
+            <div id="errorMsg" class="alert " ></div>
+
+            <form name="form2" id="regUser" accept-charset="utf-8" action="" method="post">
+                <ul class="reg_form" id="reg-ul">
+                    <li>
+
+                        <label for="username" class="input-tips2">用户名：</label>
+                        <div class="inputOuter2">
+                            <input type="text" id="username" name="username" maxlength="16" placeholder="请输入账号" class="inputstyle2"/>
+                        </div>
+
+                    </li>
+
+                    <li>
+                        <label for="password" class="input-tips2">密码：</label>
+                        <div class="inputOuter2">
+                            <input type="password" id="password" name="password" maxlength="16" placeholder="请输入密码" class="inputstyle2"/>
+                        </div>
+
+                    </li>
+                    <li>
+                        <label for="password2" class="input-tips2">确认密码：</label>
+                        <div class="inputOuter2">
+                            <input type="password" id="password2" name="" maxlength="16" placeholder="请确认密码" class="inputstyle2"/>
+                        </div>
+
+                    </li>
+
+                    <li>
+                        <label for="email" class="input-tips2">email：</label>
+                        <div class="inputOuter2">
+
+                            <input type="text" id="email" name="email" maxlength="25" placeholder="请输入email" class="inputstyle2"/>
+                        </div>
+
+                    </li>
+
+                    <li>
+
+                        <div class="pwdArea">
+                            <label class="input-tips2 " for="checkcode">验证码：</label>
+                            <div class="inputOuter">
+                                <input type="text" id="checkcode"  name="checkcode"  class="inputstyle3"/>
+                                <img src="checkCode" id="checkimg" onclick="changeCheckCode(this)" style="padding-left: 20px;padding-bottom: 5px" alt="">
+                            </div>
+                        </div>
+
+                    </li>
+
+                    <li>
+                        <div class="inputArea">
+                            <input type="button" id="reg" style="margin-top:10px;margin-left: 100px;width: 90px" class="button_blue"
+                                   value="注 册"/>
+                        </div>
+
+                    </li>
+                </ul>
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

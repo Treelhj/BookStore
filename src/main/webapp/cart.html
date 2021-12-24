@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+
+    <style>
+        table {
+            border: 1px solid;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 55%;
+        }
+
+        td, th {
+            text-align: center;
+            border: 1px solid;
+            height: 30px;
+        }
+
+        th {
+            background: #eee;
+            font-weight: normal;
+        }
+
+        tr {
+            background-color: white;
+        }
+
+        tr:hover {
+            background-color: #D1FFFC;
+        }
+        td a:hover {
+            color: #06f;
+            text-decoration: underline;
+        }
+
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 15px;
+        }
+
+        .dataArea{
+            margin-top: 20px;
+            margin-left:22%;
+            margin-bottom: 120px;
+            width: 700px;
+
+        }
+        .dataArea .partArea{
+            width: 570px;
+            padding-bottom: 35px;
+
+        }
+        .dataArea .partArea .input-tips{
+            width: 70px;
+            float: left;
+        }
+        .dataArea .partArea .textArea{
+            float: left;
+            width: 500px;
+        }
+
+        .tijiao{
+            margin-top: 10px;
+            margin-left:500px;
+            margin-bottom: 15px;
+            display:inline-block;
+            /*background-color: red;*/
+        }
+
+        .orderPrice{
+            width:150px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display:inline-block;
+            margin-left: 23%;
+            /*background-color: #4cae4c;*/
+        }
+    </style>
+
+    <script>
+
+
+        $(function(){
+
+            $.ajax({
+                url: 'user/getUser',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success:function(data){
+                    if(data==null){
+                        location.href="index.html";
+                    }
+                }
+
+            });
+
+            $.ajaxSettings.async=false;
+            $.get("cart/getCart",{},function(carts){
+                var lis='';
+                for(var i=0;i<carts.length;i++){
+                    var cart=carts[i];
+                    var li='<tr>\n' +
+                        '        <td><input type="checkbox" name="item" value="'+cart.cid+'"></td>\n' +
+                        '        <td>'+(i+1)+'</td>\n' +
+                        '        <td>'+cart.bname+'</td>\n' +
+                        '        <td>'+cart.num+'</td>\n' +
+                        '        <td >'+cart.price+'</td>\n' +
+                        '        <td class="price">'+cart.totalprice+'</td>\n' +
+                        '        <td><a href="javascript:void(0);" onclick="delCart('+cart.cid+')">删除</a></td>\n' +
+                        '    </tr>';
+                    lis+=li;
+                }
+                $("#firstTr").after(lis);
+                $.ajaxSettings.async=true;
+
+            });
+
+
+
+
+            $("#checkAll").click(function(){
+                if(this.checked){//被选中
+                    $(":checkbox[name='item']").prop("checked",true);
+                }else{
+                    $(":checkbox[name='item']").prop("checked",false);
+                }
+                setsumPrice();
+            });
+
+            $(":checkbox[name='item']").each(function(){
+                $(this).click(function(){
+                    var items=$(":checkbox[name='item']");
+                    var all=$("#checkAll");
+                    for(var i=0;i<items.length;i++){
+                        if(!items[i].checked){
+                            if(all.prop("checked")){
+                                all.prop("checked",false)
+                            }
+                            break;
+                        }else if(i===items.length-1){
+                            all.prop("checked",true);
+                            setsumPrice()
+                            return;
+                        }
+                    }
+                    setsumPrice()
+                });
+            });
+
+
+
+            $("#submitCart").click(function(){
+                var cids=[];
+                var items=$(":checkbox[name='item']:checked");
+                for(var i=0;i<items.length;i++){
+                    cids.push(items[i].value);
+                }
+                // alert(cids);
+                if(getsumPrice()==0){
+                    alert("请先选中商品！");
+                    return;
+                }
+
+                if(checkPeople()&&checkTelephone()&&checkAddress()){
+
+                    //提交编号列表，在后端生成订单号，并清理购物车，然后生成支付页面并跳转。
+                    var people=$("#people").val();
+                    var telephone=$("#telephone").val();
+                    var address=$("#address").val();
+                    var price=getsumPrice();
+                    // alert(cids+"  "+people+" "+telephone+" "+address+" "+price);
+                    cids = JSON.stringify(cids)
+                    $.post("order/addOrder",{cids:cids,people:people,telephone:telephone,address:address,price:price},function(oid){
+                        if(window.confirm("是否立即支付订单？")){
+                            location.href="payment.html?oid="+oid+"&price="+price;
+                        }else{
+                            location.reload();
+                        }
+                    })
+
+                }else{
+                    alert("请正确填写订单信息！");
+                }
+
+
+            });
+
+            $("#clearCart").click(function(){
+                if(window.confirm("您确定删除全部商品吗？")) {
+                    var cids=[];
+                    var items=$(":checkbox[name='item']");
+                    for(var i=0;i<items.length;i++){
+                        cids.push(items[i].value);
+                    }
+                    clearCart(cids);
+                    setsumPrice(cids);
+                }
+            });
+
+
+
+            $("#people").blur(checkPeople);
+            $("#telephone").blur(checkTelephone);
+            $("#address").blur(checkAddress);
+
+
+        });
+
+
+        function delCart(cid){
+            if(window.confirm("您确定删除该商品吗？")) {
+                $.get("cart/delCart",{cid:cid},function(){
+                    //代码刷新页面
+                    location.reload();
+                })
+            }
+
+
+        }
+
+        function clearCart(cids_js){
+            var cids = JSON.stringify(cids_js)
+            $.get("cart/clearCart",{cids:cids},function(){
+                alert("删除成功！");
+                //代码刷新页面
+                location.reload();
+            });
+        }
+
+        function setsumPrice(){
+           var allPrice=getsumPrice();
+            $("#setTotalPrice").html(allPrice);
+
+        }
+        function getsumPrice(){
+            var prices=$("input[name='item']:checked");
+            var allPrice=0;
+            for(var i=0;i<prices.length;i++){
+                var row=$(prices[i]).parent("td").parent("tr");
+                var pstr=row.find("[class='price']").html();
+                var p=parseFloat(pstr);
+                allPrice += p;
+            }
+            return allPrice;
+        }
+
+        function checkPeople(){
+            var people=$("#people").val();
+            var flag=null;
+            if(people == null || people ==""){
+                $("#people").css("border","1px solid red");
+                flag=false;
+            }else{
+                $("#people").css("border","");
+                flag=true;
+            }
+            return flag;
+        }
+
+        function checkTelephone(){
+            var telephone=$("#telephone").val();
+            var reg_telephone=/^1[34578]\d{9}$/;
+            var flag=reg_telephone.test(telephone);
+            var reg_telephone=/^1[34578]\d{9}$/;
+            var flag=reg_telephone.test(telephone);
+            if (flag){
+                //合法
+                $("#telephone").css("border","");
+            }else {
+                //不合法
+                $("#telephone").css("border","1px solid red");
+            }
+            return flag;
+            return flag;
+        }
+
+        function checkAddress(){
+            var address=$("#address").val();
+            var flag=null;
+            if(address == null || address ==""){
+                $("#address").css("border","1px solid red");
+                flag=false;
+            }else{
+                $("#address").css("border","");
+                flag=true;
+            }
+            return flag;
+        }
+
+
+    </script>
+
+
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="title">
+    <span>购物车</span>
+</div>
+
+<div class="orderPrice">
+    <h4>总价：<span style="color: red" id="setTotalPrice">0</span> 元</h4>
+</div>
+
+<div class="tijiao" >
+
+    <button type="button" class="btn btn-danger" id="clearCart">清空购物车</button>
+    <button type="button" class="btn btn-success" id="submitCart">提交订单</button>
+
+</div>
+
+<table id="content">
+
+    <tr id="firstTr">
+        <th width="10%"><input type="checkbox"  id="checkAll" ></th>
+        <th width="10%">编号</th>
+        <th width="35%">书名</th>
+        <th width="10%">数量</th>
+        <th width="10%">单价</th>
+        <th width="10%">总价</th>
+        <th width="10%">操作</th>
+    </tr>
+
+    <!--<tr>
+        <td><input type="checkbox" name="item" value="1"></td>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td>300</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+
+    <tr>
+        <td><input type="checkbox" name="item" value="2"></td>
+        <td>2</td>
+        <td>最朴素的生活和最遥远的梦想</td>
+        <td>10</td>
+        <td>30</td>
+        <td>300</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+
+    <tr>
+        <td><input type="checkbox" name="item" value="3"></td>
+        <td>3</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td>300</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>-->
+
+
+
+
+</table>
+
+<div  class="dataArea">
+    <div class="partArea">
+        <label class="input-tips" for="people">收货人：</label>
+        <div class="textArea"><input type="text" id="people" name="people" placeholder="请输入姓名" /></div>
+    </div>
+    <div class="partArea">
+        <label class="input-tips" for="telephone">手机号：</label>
+        <div class="textArea"><input type="text" id="telephone" name="telephone" placeholder="请输入手机号" /></div>
+    </div>
+    <div class="partArea">
+        <label class="input-tips" for="address">收货地址：</label>
+        <div class="textArea"><input type="text" id="address" name="address" style="width: 350px" placeholder="请输入收货地址" /></div>
+    </div>
+
+
+</div>
+
+
+</body>
+</html>

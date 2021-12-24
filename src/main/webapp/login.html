@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <!-- 样式 -->
+    <link rel="stylesheet" href="css/login.css">
+
+    <script>
+
+        function checkUusername(){
+            var username=$("#uusername").val();
+            var flag=null;
+            if(username == null || username==""){
+                $("#uusername").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#uusername").css("border","");
+                flag=true;
+            }
+            return flag;
+        };
+        function checkUpassword() {
+
+            var upassword = $("#upassword").val();
+            var flag=null;
+            if(upassword == null || upassword == ""){
+                $("#upassword").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#upassword").css("border","");
+                flag=true;
+            }
+            return flag;
+        }
+        function checkUcheckcode(){
+
+            var checkcode=$("#ucheckcode").val();
+            var flag=null;
+            if(checkcode == null || checkcode==""){
+                $("#ucheckcode").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#ucheckcode").css("border","");
+                flag=true;
+            }
+            return flag;
+
+        };
+        function checkAusername(){
+            var username=$("#ausername").val();
+            var flag=null;
+            if(username == null || username == ""){
+                $("#ausername").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#ausername").css("border","");
+                flag=true;
+            }
+            return flag;
+        };
+        function checkApassword() {
+            var password = $("#apassword").val();
+            var flag=null;
+            if(password == null || password == ""){
+                $("#apassword").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#apassword").css("border","");
+                flag=true;
+            }
+            return flag;
+        }
+        function checkAcheckcode(){
+            var checkcode=$("#acheckcode").val();
+            var flag=null;
+            if(checkcode == null || checkcode==""){
+                $("#acheckcode").css("border","1px solid red");
+                flag=fasle;
+            }else{
+                $("#acheckcode").css("border","");
+                flag=true;
+            }
+            return flag;
+        };
+
+
+
+        function changeCheckCode(img){
+            img.src="checkCode?"+new Date().getTime();
+        }
+
+        $(function () {
+            $('#switch_ulogin').click(function () {
+                $('#switch_alogin').removeClass("switch_btn_focus").addClass('switch_btn');
+                $('#switch_ulogin').removeClass("switch_btn").addClass('switch_btn_focus');
+                $('#switch_bottom').animate({left: '0px', width: '70px'});
+                $('#web_a_login').css('display', 'none');
+                $('#web_u_login').css('display', 'block');
+                $("#ucheck").attr("src","checkCode?"+new Date().getTime());
+
+
+
+            });
+            $('#switch_alogin').click(function () {
+
+                $('#switch_alogin').removeClass("switch_btn").addClass('switch_btn_focus');
+                $('#switch_ulogin').removeClass("switch_btn_focus").addClass('switch_btn');
+                $('#switch_bottom').animate({left: '154px', width: '70px'});
+                $('#web_a_login').css('display', 'block');
+                $('#web_u_login').css('display', 'none');
+                $("#acheck").attr("src","checkCode?"+new Date().getTime());
+
+            });
+
+
+
+            $(document).keydown(function(event) {
+                if (event.keyCode == 13) {
+                    if( $('#web_u_login').css("display")=="block"){
+                        $("#ulogin").click();
+                    }else{
+                        $("#alogin").click();
+                    }
+                }
+            });
+
+
+
+            $("#ulogin").click(function () {
+                if(checkUusername()&&checkUpassword()&&checkUcheckcode()){
+
+                        $.post("user/login",$("#u_login_form").serialize(),function (data) {
+                            if(data.flag){
+                                //登录成功
+                                location.href="index.html";
+                            }else {
+                                $("#uerrorMsg").html(data.errorMsg);
+                                $("#ucheck").attr("src","checkCode?"+new Date().getTime());
+                            }
+                        })
+                }
+            });
+
+
+
+            $("#alogin").click(function () {
+                if(checkAusername()&&checkApassword()&&checkAcheckcode()){
+                    $.post("user/alogin",$("#a_login_form").serialize(),function (data) {
+                        if(data.flag){
+                            //登录成功
+                            location.href="manage_index.html";
+                        }else {
+                            $("#aerrorMsg").html(data.errorMsg);
+                            $("#acheck").attr("src","checkCode?"+new Date().getTime());
+                        }
+                    })
+                }
+
+
+            });
+
+            //离开焦点。调用对应校验方法
+            $("#uusername").blur(checkUusername);
+            $("#upassword").blur(checkUpassword);
+            $("#ucheckcode").blur(checkUcheckcode);
+            $("#ausername").blur(checkAusername);
+            $("#apassword").blur(checkApassword);
+            $("#acheckcode").blur(checkAcheckcode);
+
+
+        });
+
+
+
+    </script>
+
+
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="login" style="margin-top:140px;">
+
+    <div class="header">
+        <div class="switch" id="switch">
+            <span class="switch_btn_focus" id="switch_ulogin" href="javascript:void(0);" tabindex="7">用户登录</span>
+            <span class="switch_btn" id="switch_alogin" href="javascript:void(0);" tabindex="8" style="margin-left: 80px">管理员登录</span>
+            <div class="switch_bottom" id="switch_bottom" style="position: absolute; width: 64px; left: 0px;"></div>
+        </div>
+    </div>
+
+    <!--用户登录-->
+    <div class="web_u_login" id="web_u_login" style="display: block; height: 315px;">
+        <div class="web_login">
+            <div class="login_form">
+                <!--登录错误提示消息-->
+                <div id="uerrorMsg" class="alert " ></div>
+
+                <form action="" name="uform" accept-charset="utf-8" id="u_login_form" method="post">
+                    <div class="uinArea" id="uinArea">
+                        <label class="input-tips" for="uusername">用户名：</label>
+                        <div class="inputOuter">
+                            <input type="text" id="uusername" name="username" placeholder="请输入账号" class="inputstyle"/>
+                        </div>
+                    </div>
+
+                    <div class="pwdArea" id="pwdArea">
+                        <label class="input-tips" for="upassword">密码：</label>
+                        <div class="inputOuter">
+                            <input type="password" id="upassword" name="password" placeholder="请输入密码" class="inputstyle"/>
+                        </div>
+                    </div>
+                    <div class="pwdArea">
+                        <label class="input-tips" for="ucheckcode">验证码：</label>
+                        <div class="inputOuter">
+                            <input type="text" id="ucheckcode" name="checkcode"  class="inputstyle2"/>
+                            <img src="checkCode" id="ucheck" onclick="changeCheckCode(this)" style="float: left;padding-left: 20px;padding-top: 4px" alt="">
+                        </div>
+                    </div>
+                    <div id="ulogin" style="padding-left:50px;margin-top:20px;"><input  type="button" value="登 录" style="width:150px;" class="button_blue"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--管理员登录-->
+    <div class="web_a_login" id="web_a_login" style="display: none; height: 315px;">
+        <div class="web_login">
+            <div class="login_form">
+                <!--登录错误提示消息-->
+                <div id="aerrorMsg" class="alert " ></div>
+
+                <form action="" name="aform" accept-charset="utf-8" id="a_login_form" method="post">
+                    <div class="uinArea">
+                        <label class="input-tips" for="ausername">用户名：</label>
+                        <div class="inputOuter">
+                            <input type="text" id="ausername" name="username" placeholder="请输入账号" class="inputstyle"/>
+                        </div>
+                    </div>
+                    <div class="pwdArea">
+                        <label class="input-tips" for="apassword">密码：</label>
+                        <div class="inputOuter">
+                            <input type="password" id="apassword" name="password" placeholder="请输入密码" class="inputstyle"/>
+                        </div>
+                    </div>
+
+
+                    <div class="pwdArea">
+                        <label class="input-tips" for="acheckcode">验证码：</label>
+                        <div class="inputOuter">
+                            <input type="text" id="acheckcode" name="checkcode"  class="inputstyle2"/>
+                            <img src="checkCode" id="acheck" onclick="changeCheckCode(this)" style="float: left;padding-left: 20px;padding-top: 4px" alt="">
+                        </div>
+                    </div>
+
+                    <div id="alogin" style="padding-left:50px;margin-top:20px;"><input  type="button" value="登 录" style="width:150px;" class="button_blue"/></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--注册end-->
+</div>
+</body>

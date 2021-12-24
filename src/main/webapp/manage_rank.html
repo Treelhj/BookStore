@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>售出记录</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+
+
+    <script src="js/ainclude.js"></script>
+    <style>
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            border: 1px solid;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 55%;
+        }
+
+        td, th {
+            text-align: center;
+            border: 1px solid;
+            height: 30px;
+        }
+
+        th {
+            background: #eee;
+            font-weight: normal;
+        }
+
+        tr {
+            background-color: white;
+        }
+
+        tr:hover {
+            background-color: #D1FFFC;
+        }
+
+        td a:hover {
+            color: #06f;
+            text-decoration: underline;
+        }
+    </style>
+
+    <script>
+
+
+        $(function(){
+
+            $.ajax({
+                url: 'user/getAdmin',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    if (data == null) {
+                        location.href = "index.html";
+                    }
+                }
+
+            });
+
+
+            $.ajax({
+                url: 'cart/getRank',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success: function (carts) {
+
+                    var lis='';
+                    for(var i=0;i<carts.length;i++) {
+                        var cart = carts[i];
+                        var li='<tr>\n' +
+                            '        <td>'+(i+1)+'</td>\n' +
+                        '        <td>'+cart.bname+'</td>\n' +
+                        '        <td>'+cart.price+'</td>\n' +
+                        '        <td>'+cart.num+'</td>\n' +
+                        '    </tr>';
+
+                        lis+=li;
+                    }
+                    $("#firstTr").after(lis);
+
+                }
+
+            });
+
+        });
+
+
+    </script>
+</head>
+<body>
+
+
+<div id="header"></div>
+<div class="title">
+    <span>售出记录</span>
+</div>
+
+<table>
+
+    <tr id="firstTr">
+
+        <th width="10%">编号</th>
+        <th width="30%">书名</th>
+        <th width="10%">单价</th>
+        <th width="10%">售出数量</th>
+    </tr>
+    <!--<tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>245</td>
+    </tr>-->
+</table>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<script>
+
+    $.get("user/getUser",{},function(data){
+        if(data ==null){
+            $("#exit").css("display","none");
+            $("#name").css("display","none");
+            $("#shop").css("display","none");
+            $("#record").css("display","none");
+        }else{
+            var msg="欢迎回来，"+data.username;
+
+            $("#name").html(msg)
+            $("#login").css("display","none");
+            $("#register").css("display","none");
+            $("#exit").css("display","block");
+            $("#name").css("display","block");
+            $("#shop").css("display","block");
+            $("#record").css("display","block");
+
+        }
+
+
+    });
+
+$(function(){
+
+
+
+    $('#myTab').find('a').each(function(){
+
+        // alert(this.href);
+        // alert(document.location.href);
+        if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+            $(this).parent().addClass('active'); // this.className = 'active';
+        }
+
+    });
+
+
+
+
+
+
+
+});
+
+
+</script>
+
+
+<div id="header">
+    <ul class="nav nav-tabs" id="myTab">
+        <li role="presentation" id="home" ><a href="index.html">主页</a></li>
+        <li role="presentation" id="shop" style="display: none"><a href="cart.html">购物车</a></li>
+        <li role="presentation" id="record" style="display: none"><a href="order_record.html">订单</a></li>
+        <li role="presentation" id="exit" style="float: right;display: none"><a href="user/exit">退出</a></li>
+        <li role="presentation" id="name"  style="float: right;margin-top: 13px;display: none;">欢迎回来，王五！</li>
+        <li role="presentation" id="register"  style="float: right;display: block"><a href="register.html">注册</a></li>
+        <li role="presentation" id="login"  style="float: right;display: block"><a href="login.html">登录</a></li>
+
+    </ul>
+</div>

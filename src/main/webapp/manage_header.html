@@ -1,0 +1,39 @@
+
+<script>
+    $.get("user/getAdmin",{},function(data){
+        if(data==null){
+            location.href="index.html";
+        }else {
+            var msg = "管理员 : " + data.username+" ";
+
+            $("#name").html(msg)
+        }
+    });
+
+    $(function(){
+
+        $('#myTab').find('a').each(function(){
+
+            // alert(this.href);
+            // alert(document.location.href);
+            if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+                $(this).parent().addClass('active'); // this.className = 'active';
+            }
+
+        });
+
+    });
+
+</script>
+
+
+<div id="header">
+    <ul class="nav nav-tabs" id="myTab">
+        <li role="presentation"  ><a href="manage_index.html">商品管理</a></li>
+        <li role="presentation"  ><a href="manage_rank.html">售出记录</a></li>
+        <li role="presentation"  ><a href="manage_order.html">订单管理</a></li>
+        <li role="presentation" style="float: right;"><a href="user/exit">退出</a></li>
+        <li role="presentation" id="name"  style="float: right;margin-top: 12px;">管理员: 王五</li>
+    </ul>
+</div>
+

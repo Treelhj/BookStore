@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单管理</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+
+    <style>
+
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 45px;
+        }
+
+        table {
+            border: 1px solid;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin: 0 auto;
+            width:60%;
+
+        }
+
+        td, th {
+            text-align: center;
+            border: 1px solid;
+            height: 30px;
+        }
+
+        th {
+            background: #eee;
+            font-weight: normal;
+        }
+
+        tr {
+            background-color: white;
+        }
+
+        tr:hover {
+            background-color: #D1FFFC;
+        }
+        td a:hover {
+            color: #06f;
+            text-decoration: underline;
+        }
+
+    </style>
+
+    <script>
+
+        $(function(){
+
+            $.ajax({
+                url: 'user/getUser',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success:function(data){
+                    if(data==null){
+                        location.href="index.html";
+                    }
+                }
+
+            });
+
+            $.ajax({
+                url:'order/getOrder',
+                type:'get',
+                dataType:'json',
+                async:false,
+                success:function(orders){
+                    var lis="";
+                    for(var i=0;i<orders.length;i++){
+                        var order=orders[i];
+                        var time=formatDateTime(order.time_stamp);
+                        var li ='<tr>\n' +
+                            '        <td>'+order.oid+'</td>\n' +
+                            '        <td>'+order.username+'</td>\n' +
+                            '        <td>'+time+'</td>\n' +
+                            '        <td>'+order.price+'</td>\n' +
+                            '        <td>'+order.status+'</td>\n' +
+                            '        <td><a href="javascript:void(0);" onclick="toDetail(\''+order.oid+'\',\''+order.name+'\',\''+order.telephone+'\',\''+order.address+'\','+order.price+')">detail</a></td>';
+                        if(order.status=='Y'){
+                            li+='<td>无</td>\n' +
+                                '    </tr>';
+                        }else{
+                            li+='<td><a href="javascript:void(0);" onclick="delOrder(\''+order.oid+'\')">删除</a>/<a href="javascript:void(0);" onclick="payOrder(\''+order.oid+'\','+order.price+')">支付</a></td>\n' +
+                                '    </tr>';
+                            // alert(li)
+                        }
+                        lis+=li;
+                    }
+                    $("#firstTr").after(lis);
+
+
+                }
+            });
+
+
+
+
+
+
+        });
+
+
+
+
+
+        function formatDateTime(inputTime) {
+            var date = new Date(inputTime);
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+        };
+
+        function payOrder(oid,price){
+            location.href="payment.html?oid="+oid+"&price="+price;
+        };
+
+        function toDetail(oid,name,telephone,address,price){
+            location.href="order_detail.html?oid="+oid+"&name="+name+"&telephone="+telephone+"&address="+address+"&price="+price;
+        }
+
+        function delOrder(oid){
+            if(window.confirm("您确定删除该订单吗？")) {
+                $.get("order/delOrder",{oid:oid},function(){
+                    alert("删除成功！");
+                    //代码刷新页面
+                    location.reload();
+                })
+            }
+
+        }
+
+
+
+    </script>
+
+
+</head>
+<body>
+<div id="header"></div>
+
+<div class="title">
+    <span>订单管理</span>
+</div>
+
+<table>
+
+    <tr id="firstTr">
+        <th width="35%">订单号</th>
+        <th width="12%">用户名</th>
+        <th width="17%">创建时间</th>
+        <th width="10%">总额</th>
+        <th width="8%">支付状态</th>
+        <th width="9%">订单详情</th>
+        <th width="9%">操作</th>
+    </tr>
+
+    <!--<tr>
+        <td>539f8661d5fa4a5884e028f156029ec6</td>
+        <td>王五</td>
+        <td>2021-12-14 02:17:01</td>
+        <td>244</td>
+        <td>Y</td>
+        <td><a>detail</a></td>
+        <td><a>删除</a></td>
+    </tr>
+
+    <tr>
+        <td>539f8661d5fa4a5884e028f156029ec6</td>
+        <td>王五</td>
+        <td>2021-12-14 02:17:01</td>
+        <td>244</td>
+        <td>Y</td>
+        <td><a>detail</a></td>
+        <td><a>删除</a></td>
+    </tr>
+    <tr>
+        <td>539f8661d5fa4a5884e028f156029ec6</td>
+        <td>王五</td>
+        <td>2021-12-14 02:17:01</td>
+        <td>244</td>
+        <td>N</td>
+        <td><a href="javascript:void(0)" onclick="toDetail()">detail</a></td>
+        <td><a href="javascript:void(0)" onclick="delOrder()">删除</a>/<a href="javascript:void(0)" onclick="payOrder()">支付</a></td>
+    </tr>-->
+
+
+</table>
+
+
+
+</body>
+</html>

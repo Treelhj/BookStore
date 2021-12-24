@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付成功</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <script src="js/getParameter.js"></script>
+
+    <style>
+
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 15px;
+
+        }
+    </style>
+
+    <script>
+
+        $(function(){
+            var oid=getParameter("oid");
+            setFlag(oid);
+        });
+
+        function setFlag(oid){
+            $.get("order/setOrderY",{oid:oid},function(){
+            });
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="title">
+    <span>支付成功提示</span>
+</div>
+
+<h1 style="text-align: center;padding-top: 150px">支付成功，订单生效！</h1>
+
+
+</body>
+</html>

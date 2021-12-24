@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理首页</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+
+
+    <script src="js/ainclude.js"></script>
+
+    <style>
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            border: 1px solid;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 55%;
+        }
+
+        td, th {
+            text-align: center;
+            border: 1px solid;
+            height: 30px;
+        }
+
+        th {
+            background: #eee;
+            font-weight: normal;
+        }
+
+        tr {
+            background-color: white;
+        }
+
+        tr:hover {
+            background-color: #D1FFFC;
+        }
+
+        td a:hover {
+            color: #06f;
+            text-decoration: underline;
+        }
+        .add{
+            margin-top: 10px;
+            margin-left:70%;
+            margin-bottom: 15px;
+            /*background-color: red;*/
+        }
+    </style>
+
+    <script>
+
+        $(function(){
+
+            $.get('book/getBook',{},function(books){
+                var lis='';
+                for(var i=0;i<books.length;i++) {
+                    var book = books[i];
+                    var li=' <tr>\n' +
+                        '        <td>'+(i+1)+'</td>\n' +
+                        '        <td>'+book.bname+'</td>\n' +
+                        '        <td>'+book.bprice+'</td>\n' +
+                        '        <td>'+book.bcount+'</td>\n' +
+                        '        <td><a href="javascript:void(0);" onclick="del('+book.bid+')">删除</a> / <a href="javascript:void(0);" onclick="update('+book.bid+')">修改</a></td>\n' +
+                        '    </tr>';
+                    lis+=li;
+                }
+                $("#firstTr").after(lis);
+
+            });
+
+            $("#addBook").click(function(){
+                location.href='manage_add.html';
+            });
+
+        });
+
+        function del(bid){
+            if(window.confirm("您确定删除该商品吗？")) {
+                $.get('book/setN', {bid: bid}, function () {
+                    alert("删除成功！");
+                    location.reload();
+                });
+            }
+        }
+
+
+        function update(bid){
+            location.href='manage_update.html?bid='+bid;
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+
+<div id="header"></div>
+<div class="title">
+    <span>商品管理</span>
+</div>
+
+<div class="add" >
+    <button type="button" class="btn btn-success" id="addBook">增加商品</button>
+</div>
+
+
+<table>
+
+    <tr id="firstTr">
+        <th width="10%">编号</th>
+        <th width="35%">书名</th>
+        <th width="10%">单价</th>
+        <th width="10%">库存</th>
+        <th width="10%">操作</th>
+    </tr>
+
+   <!-- <tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td><a href="javascript:void(0);">删除</a> / <a href="javascript:void(0);">修改</a></td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>-->
+</table>
+
+
+</body>
+</html>

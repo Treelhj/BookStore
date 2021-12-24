@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单详情</title>
+
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <script src="js/getParameter.js"></script>
+
+    <style>
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            /*border: 1px solid;*/
+            /*table-layout: fixed;*/
+            border-collapse: collapse;
+            margin: 10px auto;
+            width: 60%;
+
+        }
+
+        td, th {
+            text-align: center;
+            border: 1px solid;
+            height: 40px;
+        }
+
+        th {
+            background: #eee;
+            font-weight: normal;
+        }
+
+        tr {
+            background-color: white;
+        }
+
+        tr:hover {
+            background-color: #D1FFFC;
+        }
+
+        .box{
+            margin-left:70%;
+        }
+    </style>
+
+
+    <script>
+
+        $(function () {
+            $.ajax({
+                url: 'user/getUser',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success:function(data){
+                    if(data==null){
+                        location.href="index.html";
+                    }
+                }
+
+            });
+
+
+            var oid = getParameter("oid");
+            var name = getParameter("name");
+            if (name) {
+                //url解码
+                name = window.decodeURIComponent(name);
+            }
+            var telephone = getParameter("telephone");
+            var address = getParameter("address");
+            if (address) {
+                //url解码
+                address = window.decodeURIComponent(address);
+            }
+            var price = getParameter("price");
+
+
+            $("#name").html(name);
+            $("#telephone").html(telephone);
+            $("#oid").html(oid);
+            $("#address").html(address);
+            $("#price").html(price);
+
+            $.ajax({
+                url:'order/getDetail',
+                type:'get',
+                data:{oid:oid},
+                dataType:'json',
+                async:false,
+                success:function(carts){
+                    var lis="";
+                    for(var i=0;i<carts.length;i++){
+                        var cart=carts[i];
+                        var li=' <tr>\n' +
+                            '        <td>'+i+1+'</td>\n' +
+                            '        <td>'+cart.bname+'</td>\n' +
+                            '        <td>'+cart.num+'</td>\n' +
+                            '        <td>'+cart.price+'</td>\n' +
+                            '        <td>'+cart.totalprice+'</td>\n' +
+                            '    </tr>';
+
+                        lis+=li;
+                    }
+                    $("#firstTr").after(lis);
+                }
+            });
+
+
+            $("#toBefore").click(function(){
+                location.href="order_record.html";
+            });
+
+        });
+
+
+
+    </script>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="title">
+    <span>订单详情</span>
+</div>
+
+<div class="box" >
+    <button type="button" class="btn btn-success" id="toBefore">返回订单管理</button>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="5">
+    <tr>
+        <th>订单号</th>
+        <td  id="oid">6a3c1ae614d3432b8276832a9d0369f1</td>
+        <th>总额</th>
+        <td id="price"  colspan="2" >29</td>
+    </tr>
+    <tr>
+        <th>姓名</th>
+        <td id="name">小王</td>
+        <th>手机号</th>
+        <td colspan="2" id="telephone">13443534511</td>
+    </tr>
+    <tr>
+        <th>地址</th>
+        <td colspan="4" id="address">山海北极</td>
+    </tr>
+>
+
+
+
+    <tr id="firstTr">
+        <th colspan="">编号</th>
+        <th>书名</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>总价</th>
+    </tr>
+
+    <!--<tr>
+        <td>1</td>
+        <td>夏日走过山间</td>
+        <td>10</td>
+        <td>30</td>
+        <td>300</td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>最朴素的生活和最遥远的梦想</td>
+        <td>10</td>
+        <td>30</td>
+        <td>300</td>
+    </tr>-->
+
+</table>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付页面</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery导入-->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <script src="js/getParameter.js"></script>
+
+    <style>
+
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 15px;
+        }
+
+        .pay{
+
+            padding-top: 40px;
+            text-align: center;
+        }
+
+        .text{
+
+        }
+
+    </style>
+
+
+    <script>
+
+        $(function(){
+
+            $.ajax({
+                url: 'user/getUser',
+                type: 'get',
+                dataType: 'json',
+                async: false,
+                success:function(data){
+                    if(data==null){
+                        location.href="index.html";
+                    }
+                }
+
+            });
+
+            var oid= getParameter("oid");
+            var price= getParameter("price");
+            $("#price").html(price);
+            $("#paySrc").prop("src","urlToImg?oid="+oid);
+
+            getStatus(oid);
+        });
+
+        function getStatus(oid){
+            $.ajax({
+                url: 'order/getOStatus',
+                type: 'get',
+                dataType: 'json',
+                data:{oid:oid},
+                success: function (flag) {
+
+                    if(flag == 'Y'){
+                       location.href="pay_main_ok.html";
+                    }else {
+                        //设置请求api接口时间
+                        setTimeout(getStatus(oid),5*1000);
+                    }
+                }
+            });
+        }
+
+
+
+    </script>
+
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="title">
+    <span>支付页面</span>
+</div>
+
+
+<div class="pay">
+    <img id="paySrc" src="urlToImg">
+    <div class="text">
+        <h3>共 <span style="color: red" id="price">222</span> 元，请扫码支付！</h3>
+    </div>
+</div>
+
+
+</body>
+</html>

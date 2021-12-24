@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改商品</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+
+
+    <script src="js/ainclude.js"></script>
+    <script src="js/getParameter.js"></script>
+
+    <style>
+        .title {
+
+            height: 60px;
+            line-height: 60px;
+            background: #A67D3D;
+            font-size: 22px;
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+
+        .area {
+            /*margin-bottom: 10px;*/
+            width: 100%;
+            height: 60px;
+            /*border: 1px blue solid;*/
+        }
+
+        .inputlabel {
+            margin-left: 36%;
+            float: left;
+        }
+
+        .inputarea {
+            float: left;
+            margin-left: 1%;
+        }
+    </style>
+
+    <script>
+        function checkBname() {
+            var bname = $("#bname").val();
+            var flag = null;
+            if (bname == null || bname == "") {
+                $("#bname").css("border", "1px solid red");
+                flag = fasle;
+            } else {
+                $("#bname").css("border", "");
+                flag = true;
+            }
+            return flag;
+        };
+
+        function checkBcount() {
+            var bcount = $("#bcount").val();
+            var flag = null;
+            if (bcount == null || bcount == "") {
+                $("#bcount").css("border", "1px solid red");
+                flag = fasle;
+            } else {
+                $("#bcount").css("border", "");
+                flag = true;
+            }
+            return flag;
+        };
+
+        function checkBprice() {
+            var bprice = $("#bprice").val();
+            var flag = null;
+            if (bprice == null || bprice == "") {
+                $("#bprice").css("border", "1px solid red");
+                flag = fasle;
+            } else {
+                $("#bprice").css("border", "");
+                flag = true;
+            }
+            return flag;
+        };
+
+        function checkBintroduce() {
+            var bintroduce = $("#bintroduce").val();
+            var flag = null;
+            if (bintroduce == null || bintroduce == "") {
+                $("#bintroduce").css("border", "1px solid red");
+                flag = fasle;
+            } else {
+                $("#bintroduce").css("border", "");
+                flag = true;
+            }
+            return flag;
+        };
+
+        function checkImg() {
+            var img = $("#img").val();
+            var flag = null;
+            if (img == null || img == "") {
+                $("#img").css("border", "1px solid red");
+                flag = fasle;
+            } else {
+                $("#img").css("border", "");
+                flag = true;
+            }
+            return flag;
+        };
+
+
+        $(function () {
+
+            var bid = getParameter("bid");
+
+            $.ajax({
+                url: 'book/findOne',
+                type: 'get',
+                data: {bid: bid},
+                dataType: 'json',
+                async: false,
+                success: function (book) {
+
+                    $("#bid").val(book.bid);
+                    $("#bname").val(book.bname);
+                    $("#bcount").val(book.bcount);
+                    $("#bprice").val(book.bprice);
+                    $("#bintroduce").val(book.bintroduce);
+                }
+            });
+
+
+            $("#submitbutton").click(function () {
+                if (checkBname() && checkBcount() && checkBprice() && checkBintroduce() && checkImg()) {
+
+                    var formData = new FormData($("#addForm")[0]);
+
+                    $.ajax({
+                        url: 'book/updateBook',
+                        method: 'post',
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            alert("成功修改商品，返回主页！");
+                            location.href='manage_index.html';
+                        }
+
+
+                    });
+
+
+                }
+
+            });
+
+
+            $("#bname").blur(checkBname);
+            $("#bcount").blur(checkBcount);
+            $("#bprice").blur(checkBprice);
+            $("#bintroduce").blur(checkBintroduce);
+            $("#img").blur(checkImg);
+
+        });
+
+    </script>
+
+</head>
+<body>
+<div id="header"></div>
+
+<div class="title">
+    <span>修改商品</span>
+</div>
+
+<div style="text-align: center;">
+    <form id="addForm" enctype="multipart/form-data" method="post">
+        <input name="bid" id="bid" style="display: none"/> <br>
+        <div class="area">
+            <div class="inputlabel">商品名称：</div>
+            <div class="inputarea"><input name="bname" id="bname" maxlength="30" style="width: 300px"/></div>
+        </div>
+        <div class="area" style="">
+            <div class="inputlabel">商品数量：</div>
+            <div class="inputarea"><input name="bcount" id="bcount" type="number"/></div>
+        </div>
+
+        <div class="area">
+            <div class="inputlabel">商品价格：</div>
+            <div class="inputarea"><input name="bprice" id="bprice" type="number"/> <br></div>
+        </div>
+        <div class="area">
+            <div class="inputlabel">商品介绍：</div>
+            <div class="inputarea"><textarea name="bintroduce" id="bintroduce" maxlength="50"
+                                             style="width: 350px;height: 50px" warp="virtual"></textarea></div>
+        </div>
+
+        <div class="area">
+            <div class="inputlabel">商品图片：</div>
+            <div class="inputarea"><input name="img" id="img" type="file"/><br></div>
+        </div>
+
+        <input type="button" id="submitbutton" value="提交"/>
+
+        <div style="margin-top:10px">(注意：需要重新上传图片！不超过10MB!)</div>
+    </form>
+</div>
+
+
+</body>
+</html>

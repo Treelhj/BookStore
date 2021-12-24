@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书城</title>
+
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- 导入头部 -->
+    <script type="text/javascript" src="js/include.js"></script>
+    <script src="js/getParameter.js"></script>
+
+    <style>
+        .container {
+            display: flex;
+            justify-content: left;
+            border: #1b6d85 1px solid;
+
+        }
+
+        .item {
+            flex: 1 1 150px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .price_num {
+            color: red;
+            font-size: large;
+        }
+
+        #book li {
+            padding-bottom: 10px;
+        }
+
+        ul li {
+            list-style: none; /*去掉小圆点*/
+        }
+
+
+    </style>
+
+    <script>
+
+        $(function () {
+
+
+
+            var bword = getParameter("bword");
+            if(bword == null){
+                bword='';
+            }
+            if(bword) {
+                bword = window.decodeURIComponent(bword);//url解码
+            }
+
+            // alert(bword);
+            load(null, bword);
+
+
+            $("#search-button").click(function(){
+                var bword=$("#search_input").val();
+                location.href="index.html?bword="+bword;
+            });
+
+            $(document).keydown(function(event) {
+                if (event.keyCode == 13) {
+                    $("#search-button").click();
+                }
+            });
+        });
+
+
+        function load(currentPage,bword) {
+
+            $.get("book/pageQuery", {currentPage: currentPage, bword:bword}, function (pb) {
+
+                /*
+                <nav aria-label="Page navigation" style="text-align: center">
+                    <ul class="pagination" id="pageNum">
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#">&laquo;</a></li>
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">&raquo;</a></li>
+                        <li><a href="#">尾页</a></li>
+                    </ul>
+                </nav>
+                 */
+
+                $("#totalPage").html(pb.totalPage);
+                $("#totalCount").html(pb.totalCount);
+                if(pb.totalCount==0){
+                    $("#error").css("display","block");
+                }
+                var lis="";
+                var firstPage='<li onclick="javascript:load(1,\''+bword+'\')"><a href="javascript:void(0)">首页</a></li>';
+                var beforeNum=pb.currentPage-1;
+                if(beforeNum<=0){
+                    beforeNum=1;
+                }
+                var beforePage='<li onclick="javascript:load('+beforeNum+',\''+bword+'\')"><a href="javascript:void(0)">&laquo;</a></li>';
+
+                lis+=firstPage;
+                lis+=beforePage;
+
+                var begin;
+                var end;
+                if(pb.totalPage<8){
+                    begin=1;
+                    end=pb.totalPage;
+                }else{
+                    begin=pb.currentPage-4;
+                    end=pb.currentPage+3;
+                    if(begin<1){
+                        begin=1;
+                        end=begin+7;
+                    }
+                    if(end>pb.totalPage){
+                        end=pb.totalPage;
+                        begin=end-7;
+                    }
+
+                }
+
+                for(var i=begin;i<=end;i++){
+                    var li;
+                    if(pb.currentPage==i){
+                        li='<li  class="active" onclick="javascript:load('+i+',\''+bword+'\')"><a href="javascript:void(0)">'+i+'</a></li>';
+                    }else{
+                        li='<li onclick="javascript:load('+i+',\''+bword+'\')"><a href="javascript:void(0)">'+i+'</a></li>';
+                    }
+                    lis+=li;
+                }
+                var lastPage='<li onclick="javascript:load('+pb.totalPage+',\''+bword+'\')"><a href="javascript:void(0)">尾页</a></li>';
+                var afterNum=pb.currentPage+1;
+                if(afterNum>pb.totalPage){
+                    afterNum=pb.totalPage;
+                }
+                var nextPage='<li onclick="javascript:load('+afterNum+',\''+bword+'\')"><a href="javascript:void(0)">&raquo;</a></li>';
+
+                lis+=nextPage;
+                lis+=lastPage;
+                $("#pageNum").html(lis);
+
+
+                var book_lis="";
+                for(var i=0;i<pb.list.length;i++){
+                    var book=pb.list[i];
+                    var li='<li>\n' +
+                        '        <div class="container">\n' +
+                        '            <div class="item"><img src="image/'+book.bimgid+'" alt="" height="200" width="200" ></div>\n' +
+                        '            <div class="item">\n' +
+                        '                <h4>'+book.bname+'</h4>\n' +
+                        '                <p>'+book.bintroduce+'</p>\n' +
+                        '            </div>\n' +
+                        '            <div class="item">\n' +
+                        '                <p class="price_num">\n' +
+                        '                    <span>&yen;</span>\n' +
+                        '                    <span>'+book.bprice+'</span>\n' +
+                        '                </p>\n' +
+                        '                <p>\n' +
+                        '                    <a class="btn"  href="book_detail.html?bid='+book.bid+'">查看详情</a>\n' +
+                        '                </p>\n' +
+                        '            </div>\n' +
+                        '        </div>\n' +
+                        '    </li>';
+
+                    book_lis+=li;
+                }
+                $("#bookNum").html(book_lis);
+
+                window.scroll(0,0);//回到顶部
+            })
+        }
+
+
+    </script>
+</head>
+
+
+<body>
+
+<div id="header"></div>
+
+<div class="search" style="text-align: center;height: 60px;padding-top: 15px; ">
+    <input name="" id="search_input" type="text" placeholder="请输入书籍或作者名称" class="search_input" autocomplete="off">
+    <!--<a href="javascript:;" id="search-button" class="search-button" ><font color="black">搜索</font></a>-->
+    <button class="btn btn-default" type="submit" id="search-button">搜索</button>
+</div>
+
+<div style="text-align:center;red:yellow;font-weight:bold;height:150px;padding-top:60px;font-size:30px;display: none" id="error">
+    <h4>该书店无相关书籍，请搜索其它书籍！</h4>
+</div>
+
+<ul id="bookNum">
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt="" width="200" height="200"></div>
+            <div class="item">
+                <h4>月亮与六便士</h4>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="container">
+            <div class="item"><img src="image/9388b830-4c63-11ec-bb7d-6c2b595cb29b.jpg" alt=""></div>
+            <div class="item">
+                <p>月亮与六便士</p>
+                <p>[英]毛姆 著,李嘉 译 / 中国华侨出版社</p>
+            </div>
+            <div class="item">
+                <p class="price_num">
+                    <span>&yen;</span>
+                    <span>38</span>
+                </p>
+                <p>
+                    <a class="btn" href="book_detail.html?bid=11">查看详情</a>
+                </p>
+            </div>
+        </div>
+    </li>
+
+</ul>
+
+<div style="text-align: center;font-size: large">
+    共<span id="totalPage" style="color: red">12</span>页<span id="totalCount" style="color: red">132</span>条
+</div>
+
+<nav aria-label="Page navigation" style="text-align: center">
+    <ul class="pagination" id="pageNum">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">&laquo;</a></li>
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#">&raquo;</a></li>
+        <li><a href="#">尾页</a></li>
+    </ul>
+</nav>
+
+
+</body>
+</html>
